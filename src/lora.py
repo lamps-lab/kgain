@@ -8,7 +8,8 @@ from transformers import (
     AutoModelForCausalLM,
     Trainer, 
     TrainingArguments, 
-    DataCollatorForLanguageModeling
+    DataCollatorForLanguageModeling,
+    BitsAndBytesConfig
 )
 import torch
 
@@ -98,11 +99,12 @@ test_dataset  = test_dataset.map(preprocess_function, batched=True, remove_colum
 
 #print(train_dataset[0])
 #exit()
-
+# Load quantized model using 8-bit precision
+quant_config = BitsAndBytesConfig(load_in_8bit=True)
 #"deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
-model = AutoModelForCausalLM.from_pretrained(model_id)
-print(model)
-
+model = AutoModelForCausalLM.from_pretrained(model_id, quantization_config=quant_config, device_map="auto")
+#print(model)
+print(model.get_memory_footprint())
 # In LoRA, the model's weight matrix W is adapted as:
 #   W = W0 + ΔW, where ΔW = A * B,
 # with A ∈ ℝ^(d×r) and B ∈ ℝ^(r×k), and r is the rank.
@@ -114,6 +116,8 @@ lora_config = LoraConfig(
     lora_dropout=0.1,            # dropout probability for LoRA layers
     target_modules=["q_proj", "v_proj"]  # target modules for LoRA injection (adjust as needed)
 )
+
+quant_config = BitsAndBytesConfig(load_in_8bit=True)
 
 model = get_peft_model(model, lora_config)
 print("LoRA parameters:")
