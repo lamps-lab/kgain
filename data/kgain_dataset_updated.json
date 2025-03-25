@@ -985,7 +985,7 @@
 		    "A": "40Ar/39Ar dating",
 		    "DK": "I do not know the answer.",
 		    "B": "Carbon-14 dating",
-		    "C": "Uranium-lead dating",
+		    "C": "Uranium-lead dating"
           },
           "status": "New question generated because question was not self-contained."
         }
